@@ -87,8 +87,7 @@ public class MediaPlaybackService extends Service implements MediaPlayer.OnPrepa
         @Override
         public void run() {
             while (mMediaPlayer != null) {
-                if (isPlaying())
-                    sendElapsedTime();
+                sendElapsedTime();
                 try {
                     Thread.sleep(500);
                 } catch (InterruptedException e) {

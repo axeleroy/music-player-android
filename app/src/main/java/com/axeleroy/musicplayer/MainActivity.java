@@ -110,8 +110,7 @@ public class MainActivity extends AppCompatActivity {
                 buttonPlayPause.setImageResource(resId);
             }
         });
-        // TODO: corriger le bouton lecture désactivé à la reprise
-        buttonPlayPause.setEnabled(false);
+        buttonPlayPause.setEnabled(true);
 
         buttonStop.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -128,9 +127,7 @@ public class MainActivity extends AppCompatActivity {
         elapsedTimeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                // Lorsque l'utilisateur touche à la SeekBar
-                if (fromUser)
-                    mediaPlaybackService.seekTo(progress);
+
             }
 
             @Override
@@ -140,7 +137,8 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onStopTrackingTouch(SeekBar seekBar) {
-
+                // Change la progression du titre lorsque l'utilisateur relâche la seekbar
+                mediaPlaybackService.seekTo(seekBar.getProgress());
             }
         });
 
@@ -203,9 +201,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initInfos(Uri uri) {
-        // TODO: temps écoulé remis à zéro lors de la rotation lorsque playback en pause
-        updateElapsedTime(elapsedTime);
-
         if (uri != null) {
             // Récupération des metadatas du titre
             MediaMetadataRetriever mData = new MediaMetadataRetriever();
@@ -237,17 +232,18 @@ public class MainActivity extends AppCompatActivity {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-
-            if (mediaPlaybackService.isPlaying()) {
-                buttonPlayPause.setEnabled(true);
-                buttonPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_black_48dp);
-            }
         }
     }
 
     private void updateElapsedTime(int elapsedTime) {
         elapsedTimeSeekBar.setProgress(elapsedTime);
         elapsedTimeTextView.setText(secondsToString(elapsedTime));
+
+        // Active le bouton de mise en pause
+        if (mediaPlaybackService.isPlaying()) {
+            buttonPlayPause.setEnabled(true);
+            buttonPlayPause.setImageResource(R.drawable.ic_pause_circle_outline_black_48dp);
+        }
     }
 
     private void clearInfos() {
@@ -259,6 +255,8 @@ public class MainActivity extends AppCompatActivity {
         elapsedTimeSeekBar.setEnabled(false);
         elapsedTimeSeekBar.setProgress(0);
         albumArt.setImageResource(R.drawable.ic_album_white_400_128dp);
+        buttonPlayPause.setEnabled(false);
+        buttonPlayPause.setImageResource(R.drawable.ic_play_circle_outline_black_48dp);
         setColors(null);
     }
 
